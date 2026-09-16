@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Registration {
+  id                        String   @id @default(uuid())
+  registrationId            String   @unique
+  createdAt                 DateTime @default(now())
+  
+  participant1Name          String
+  participant1RollNumber    String   @unique
+  participant1Year          String
+  participant1Branch        String
+  participant1Email         String
+  participant1Membership    String
+  
+  participant2Name          String
+  participant2RollNumber    String   @unique
+  participant2Year          String
+  participant2Branch        String
+  participant2Email         String
+  participant2Membership    String
+  
+  totalFee                  Int
+  paymentStatus             String   @default("Pending at Venue")
+  eventName                 String   @default("TechTactix 2026")
+}
