@@ -59,13 +59,13 @@ export async function POST(req: Request) {
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
-          user: process.env.GMAIL_USER || "23bk1a6611@stpetershyd.com",
-          pass: process.env.GMAIL_APP_PASSWORD || "qccoghvdkwgtgelw",
+          user: process.env.GMAIL_USER || "csi.spec@stpetershyd.com",
+          pass: process.env.GMAIL_APP_PASSWORD || "haex gyev ocff cclm",
         },
       });
 
       const info = await transporter.sendMail({
-        from: '"TechTactix 2026" <23bk1a6611@stpetershyd.com>',
+        from: '"TechTactix 2026" <csi.spec@stpetershyd.com>',
         to: `${participant1.email}, ${participant2.email}`,
         subject: 'TechTactix 2026 — Registration Confirmed 🎯',
         html: `
