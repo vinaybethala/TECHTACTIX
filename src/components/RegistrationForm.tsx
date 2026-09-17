@@ -179,9 +179,19 @@ export function RegistrationForm() {
           </div>
         )}
 
-        <Link href="/" className="inline-block px-8 py-3 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-white/10">
-          BACK TO HOME
-        </Link>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a 
+            href="https://chat.whatsapp.com/LOOqWLoBWqg55iakeue6FS?s=cl&p=a&mlu=4&ilr=4" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors font-bold glow-border"
+          >
+            JOIN WHATSAPP GROUP
+          </a>
+          <Link href="/" className="inline-block px-8 py-3 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-white/10">
+            BACK TO HOME
+          </Link>
+        </div>
       </motion.div>
     );
   }

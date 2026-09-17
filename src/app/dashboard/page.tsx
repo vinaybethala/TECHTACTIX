@@ -1,28 +1,22 @@
-import fs from 'fs/promises';
-import path from 'path';
 import Link from 'next/link';
 import { Users, CreditCard, ShieldCheck } from 'lucide-react';
+import DownloadExcelButton from '@/components/DownloadExcelButton';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Dashboard() {
-  const filePath = path.join(process.cwd(), 'registrations.json');
-  let registrations = [];
-  
-  try {
-    const fileData = await fs.readFile(filePath, 'utf-8');
-    registrations = JSON.parse(fileData);
-  } catch (e) {
-    // File might not exist yet
-  }
+  const registrations = await prisma.registration.findMany({
+    orderBy: { createdAt: 'desc' }
+  });
 
   const totalTeams = registrations.length;
   const totalStudents = totalTeams * 2;
   const totalRevenue = registrations.reduce((acc: number, curr: any) => acc + (curr.totalFee || 0), 0);
   const csiMembers = registrations.reduce((acc: number, curr: any) => {
     let count = 0;
-    if (curr.participant1?.membership === 'CSI Member') count++;
-    if (curr.participant2?.membership === 'CSI Member') count++;
+    if (curr.participant1Membership === 'CSI Member') count++;
+    if (curr.participant2Membership === 'CSI Member') count++;
     return acc + count;
   }, 0);
 
@@ -34,9 +28,12 @@ export default async function Dashboard() {
             <h1 className="text-4xl font-heading font-bold text-cyan-400 glow-text mb-2">ADMIN DASHBOARD</h1>
             <p className="text-slate-400">Live overview of TechTactix 2026 registrations</p>
           </div>
-          <Link href="/" className="px-6 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-colors">
-            Back to Website
-          </Link>
+          <div className="flex items-center gap-4">
+            <DownloadExcelButton registrations={registrations} />
+            <Link href="/" className="px-6 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-colors">
+              Back to Website
+            </Link>
+          </div>
         </div>
 
         {/* Stats Row */}
@@ -79,28 +76,28 @@ export default async function Dashboard() {
                       
                       {/* Participant 1 */}
                       <td className="px-6 py-4 border-l border-white/5">
-                        <div className="font-bold text-white">{reg.participant1?.name}</div>
-                        <div className="text-xs text-slate-400">{reg.participant1?.rollNumber}</div>
-                        <div className={`text-xs mt-1 ${reg.participant1?.membership === 'CSI Member' ? 'text-green-400' : 'text-yellow-400'}`}>
-                          {reg.participant1?.membership}
+                        <div className="font-bold text-white">{reg.participant1Name}</div>
+                        <div className="text-xs text-slate-400">{reg.participant1RollNumber}</div>
+                        <div className={`text-xs mt-1 ${reg.participant1Membership === 'CSI Member' ? 'text-green-400' : 'text-yellow-400'}`}>
+                          {reg.participant1Membership}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-slate-300">
-                        {reg.participant1?.branch}<br/>
-                        <span className="text-xs text-slate-500">{reg.participant1?.year}</span>
+                        {reg.participant1Branch}<br/>
+                        <span className="text-xs text-slate-500">{reg.participant1Year}</span>
                       </td>
 
                       {/* Participant 2 */}
                       <td className="px-6 py-4 border-l border-white/5">
-                        <div className="font-bold text-white">{reg.participant2?.name}</div>
-                        <div className="text-xs text-slate-400">{reg.participant2?.rollNumber}</div>
-                        <div className={`text-xs mt-1 ${reg.participant2?.membership === 'CSI Member' ? 'text-green-400' : 'text-yellow-400'}`}>
-                          {reg.participant2?.membership}
+                        <div className="font-bold text-white">{reg.participant2Name}</div>
+                        <div className="text-xs text-slate-400">{reg.participant2RollNumber}</div>
+                        <div className={`text-xs mt-1 ${reg.participant2Membership === 'CSI Member' ? 'text-green-400' : 'text-yellow-400'}`}>
+                          {reg.participant2Membership}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-slate-300">
-                        {reg.participant2?.branch}<br/>
-                        <span className="text-xs text-slate-500">{reg.participant2?.year}</span>
+                        {reg.participant2Branch}<br/>
+                        <span className="text-xs text-slate-500">{reg.participant2Year}</span>
                       </td>
 
                       {/* Fee */}

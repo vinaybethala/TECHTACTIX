@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
 import nodemailer from 'nodemailer';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: Request) {
   try {
@@ -14,37 +13,46 @@ export async function POST(req: Request) {
 
     const registrationId = `TTX-2026-${Math.floor(10000 + Math.random() * 90000)}`;
 
-    const newRegistration = {
-      registrationId,
-      participant1,
-      participant2,
-      totalFee,
-      createdAt: new Date().toISOString(),
-    };
-
-    const filePath = path.join(process.cwd(), 'registrations.json');
-    let existingData = [];
-    
-    try {
-      const fileData = await fs.readFile(filePath, 'utf-8');
-      existingData = JSON.parse(fileData);
-    } catch (e) {
-      // File doesn't exist yet, which is fine
+    // Check duplicates
+    if (participant1.rollNumber === participant2.rollNumber) {
+      return NextResponse.json({ error: "Participants cannot have the same roll number." }, { status: 400 });
     }
 
-    // Check duplicates
-    const isDuplicate = existingData.some((reg: any) => 
-      reg.participant1.rollNumber === participant1.rollNumber ||
-      reg.participant2.rollNumber === participant2.rollNumber ||
-      reg.participant1.rollNumber === participant2.rollNumber
-    );
+    const isDuplicate = await prisma.registration.findFirst({
+      where: {
+        OR: [
+          { participant1RollNumber: participant1.rollNumber },
+          { participant2RollNumber: participant1.rollNumber },
+          { participant1RollNumber: participant2.rollNumber },
+          { participant2RollNumber: participant2.rollNumber }
+        ]
+      }
+    });
 
     if (isDuplicate) {
       return NextResponse.json({ error: "One or both roll numbers are already registered." }, { status: 400 });
     }
 
-    existingData.push(newRegistration);
-    await fs.writeFile(filePath, JSON.stringify(existingData, null, 2));
+    await prisma.registration.create({
+      data: {
+        registrationId,
+        participant1Name: participant1.name,
+        participant1RollNumber: participant1.rollNumber,
+        participant1Year: participant1.year,
+        participant1Branch: participant1.branch,
+        participant1Email: participant1.email,
+        participant1Membership: participant1.membership,
+        
+        participant2Name: participant2.name,
+        participant2RollNumber: participant2.rollNumber,
+        participant2Year: participant2.year,
+        participant2Branch: participant2.branch,
+        participant2Email: participant2.email,
+        participant2Membership: participant2.membership,
+        
+        totalFee,
+      }
+    });
 
     // 4. Send Email via Nodemailer (Gmail)
     try {
@@ -86,6 +94,16 @@ export async function POST(req: Request) {
               ${totalFee > 0 ? "If you are a Non-CSI member, please pay the applicable ₹30 registration fee at the venue." : "Registration is FREE. CSI members: Please bring your CSI ID card if possible."}
             </p>
             
+            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+            
+            <h3>JOIN THE WHATSAPP GROUP</h3>
+            <p>Please join our official WhatsApp group for important updates and announcements:</p>
+            <p>
+              <a href="https://chat.whatsapp.com/LOOqWLoBWqg55iakeue6FS?s=cl&p=a&mlu=4&ilr=4" style="display: inline-block; padding: 10px 20px; background-color: #25D366; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                Join WhatsApp Group
+              </a>
+            </p>
+
             <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
             
             <p>Prepare your knowledge. Prepare your idea. Prepare to defend it.</p>

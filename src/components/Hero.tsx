@@ -56,19 +56,19 @@ export function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.8 }}
-          className="flex flex-wrap justify-center gap-6 mb-12"
+          className="flex flex-wrap justify-center gap-6 mb-12 animate-float"
         >
-          <div className="glass-panel px-6 py-3 rounded-lg border border-cyan-900/50 flex flex-col items-center">
-            <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Date</span>
-            <span className="font-semibold">21 Sept 2026</span>
+          <div className="glass-panel px-6 py-3 rounded-lg flex flex-col items-center hover:scale-105 transition-transform duration-300">
+            <span className="text-xs text-cyan-500 uppercase tracking-wider mb-1">Date</span>
+            <span className="font-semibold text-white">21 Sept 2026</span>
           </div>
-          <div className="glass-panel px-6 py-3 rounded-lg border border-cyan-900/50 flex flex-col items-center">
-            <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Time</span>
-            <span className="font-semibold">10:00 AM Onwards</span>
+          <div className="glass-panel px-6 py-3 rounded-lg flex flex-col items-center hover:scale-105 transition-transform duration-300">
+            <span className="text-xs text-cyan-500 uppercase tracking-wider mb-1">Time</span>
+            <span className="font-semibold text-white">10:00 AM Onwards</span>
           </div>
-          <div className="glass-panel px-6 py-3 rounded-lg border border-cyan-900/50 flex flex-col items-center">
-            <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Venue</span>
-            <span className="font-semibold">Maisammaguda</span>
+          <div className="glass-panel px-6 py-3 rounded-lg flex flex-col items-center hover:scale-105 transition-transform duration-300">
+            <span className="text-xs text-cyan-500 uppercase tracking-wider mb-1">Venue</span>
+            <span className="font-semibold text-white">Maisammaguda</span>
           </div>
         </motion.div>
 
