@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { Users, CreditCard, ShieldCheck } from 'lucide-react';
 import DownloadExcelButton from '@/components/DownloadExcelButton';
 import { prisma } from '@/lib/prisma';
-
 export const dynamic = 'force-dynamic';
 
 export default async function Dashboard() {
