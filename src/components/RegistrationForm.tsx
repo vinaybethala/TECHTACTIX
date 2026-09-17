@@ -9,7 +9,7 @@ import { Loader2, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 const branches = [
-  "CSE", "CSE (AI & ML)", "CSE (Data Science)", "CSE (IoT)", 
+  "CSE", "CSE (AI & ML)", "CSE (Data Science)", "CSE (IoT)", "CSE (Cyber Security)",
   "ECE", "EEE", "MECH", "CIVIL", "AIML", "Other"
 ];
 
