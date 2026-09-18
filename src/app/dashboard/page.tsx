@@ -2,12 +2,25 @@ import Link from 'next/link';
 import { Users, CreditCard, ShieldCheck } from 'lucide-react';
 import DownloadExcelButton from '@/components/DownloadExcelButton';
 import DeleteRegistrationButton from '@/components/DeleteRegistrationButton';
+import DashboardSearch from '@/components/DashboardSearch';
+import PaymentStatusToggle from '@/components/PaymentStatusToggle';
 import { logoutAdmin } from '@/app/actions/auth';
 import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
-export default async function Dashboard() {
+export default async function Dashboard({ searchParams }: { searchParams: { q?: string } }) {
+  const query = searchParams.q || '';
+  
+  const whereClause = query ? {
+    OR: [
+      { registrationId: { contains: query, mode: 'insensitive' as const } },
+      { participant1RollNumber: { contains: query, mode: 'insensitive' as const } },
+      { participant2RollNumber: { contains: query, mode: 'insensitive' as const } },
+    ]
+  } : {};
+
   const registrations = await prisma.registration.findMany({
+    where: whereClause,
     orderBy: { createdAt: 'desc' }
   });
 
@@ -29,7 +42,10 @@ export default async function Dashboard() {
             <h1 className="text-4xl font-heading font-bold text-cyan-400 glow-text mb-2">ADMIN DASHBOARD</h1>
             <p className="text-slate-400">Live overview of TechTactix 2026 registrations</p>
           </div>
-          <div className="flex items-center gap-4">
+          
+          <DashboardSearch initialQuery={query} />
+
+          <div className="flex items-center gap-4 mt-4 md:mt-0">
             <DownloadExcelButton registrations={registrations} />
             <Link href="/" className="px-6 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-colors">
               Back to Website
@@ -63,13 +79,14 @@ export default async function Dashboard() {
                   <th className="px-6 py-4 border-l border-white/5">Participant 2</th>
                   <th className="px-6 py-4">Branch/Year (P2)</th>
                   <th className="px-6 py-4 border-l border-white/5">Fee</th>
+                  <th className="px-6 py-4 border-l border-white/5">Payment Status</th>
                   <th className="px-6 py-4 border-l border-white/5 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {registrations.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-6 py-12 text-center text-slate-500">
+                    <td colSpan={9} className="px-6 py-12 text-center text-slate-500">
                       No registrations found yet.
                     </td>
                   </tr>
@@ -121,9 +138,14 @@ export default async function Dashboard() {
 
                       {/* Fee */}
                       <td className="px-6 py-4 border-l border-white/5">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${reg.totalFee > 0 ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'bg-green-400/10 text-green-400 border border-green-400/20'}`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${reg.totalFee > 0 ? 'bg-blue-400/10 text-blue-400 border border-blue-400/20' : 'bg-slate-400/10 text-slate-400 border border-slate-400/20'}`}>
                           {reg.totalFee === 0 ? 'FREE' : `₹${reg.totalFee}`}
                         </span>
+                      </td>
+
+                      {/* Payment Status */}
+                      <td className="px-6 py-4 border-l border-white/5">
+                        <PaymentStatusToggle id={reg.id} currentStatus={reg.paymentStatus} />
                       </td>
 
                       {/* Actions */}
