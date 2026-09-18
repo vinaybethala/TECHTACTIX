@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { Users, CreditCard, ShieldCheck } from 'lucide-react';
 import DownloadExcelButton from '@/components/DownloadExcelButton';
+import DeleteRegistrationButton from '@/components/DeleteRegistrationButton';
+import { logoutAdmin } from '@/app/actions/auth';
 import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +34,11 @@ export default async function Dashboard() {
             <Link href="/" className="px-6 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-colors">
               Back to Website
             </Link>
+            <form action={logoutAdmin}>
+              <button type="submit" className="px-6 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/20 transition-colors">
+                Logout
+              </button>
+            </form>
           </div>
         </div>
 
@@ -56,12 +63,13 @@ export default async function Dashboard() {
                   <th className="px-6 py-4 border-l border-white/5">Participant 2</th>
                   <th className="px-6 py-4">Branch/Year (P2)</th>
                   <th className="px-6 py-4 border-l border-white/5">Fee</th>
+                  <th className="px-6 py-4 border-l border-white/5 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {registrations.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center text-slate-500">
+                    <td colSpan={8} className="px-6 py-12 text-center text-slate-500">
                       No registrations found yet.
                     </td>
                   </tr>
@@ -116,6 +124,11 @@ export default async function Dashboard() {
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${reg.totalFee > 0 ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'bg-green-400/10 text-green-400 border border-green-400/20'}`}>
                           {reg.totalFee === 0 ? 'FREE' : `₹${reg.totalFee}`}
                         </span>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-6 py-4 border-l border-white/5 text-center">
+                        <DeleteRegistrationButton id={reg.id} />
                       </td>
                     </tr>
                   ))
