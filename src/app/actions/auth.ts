@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export async function loginAdmin(password: string) {
-  const adminPassword = process.env.ADMIN_PASSWORD || 'techtactix2026admin';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'CSI@2444';
   
   if (password === adminPassword) {
     cookies().set('admin_session', 'authenticated', {
