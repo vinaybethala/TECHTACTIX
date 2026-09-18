@@ -145,7 +145,13 @@ export default async function Dashboard({ searchParams }: { searchParams: { q?: 
 
                       {/* Payment Status */}
                       <td className="px-6 py-4 border-l border-white/5">
-                        <PaymentStatusToggle id={reg.id} currentStatus={reg.paymentStatus} />
+                        {reg.totalFee === 0 ? (
+                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-400/10 text-slate-400 border border-slate-400/20">
+                            N/A
+                          </span>
+                        ) : (
+                          <PaymentStatusToggle id={reg.id} currentStatus={reg.paymentStatus} />
+                        )}
                       </td>
 
                       {/* Actions */}
