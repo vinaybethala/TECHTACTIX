@@ -11,8 +11,7 @@ export function Footer() {
             </Link>
             <p className="text-slate-400 text-sm max-w-xs">
               CSI Student Chapter<br/>
-              St. Peter&apos;s Engineering College<br/>
-              Maisammaguda
+              St. Peter&apos;s Engineering College
             </p>
           </div>
           

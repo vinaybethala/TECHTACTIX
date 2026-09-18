@@ -164,7 +164,7 @@ export function RegistrationForm() {
             </div>
             <div className="col-span-2">
               <p className="text-slate-500">Venue</p>
-              <p className="text-white">St. Peter&apos;s Engineering College, Maisammaguda</p>
+              <p className="text-white">St. Peter&apos;s Engineering College</p>
             </div>
           </div>
         </div>

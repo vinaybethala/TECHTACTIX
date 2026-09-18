@@ -68,7 +68,7 @@ export function Hero() {
           </div>
           <div className="glass-panel px-6 py-3 rounded-lg flex flex-col items-center hover:scale-105 transition-transform duration-300">
             <span className="text-xs text-cyan-500 uppercase tracking-wider mb-1">Venue</span>
-            <span className="font-semibold text-white">Maisammaguda</span>
+            <span className="font-semibold text-white">St. Peter&apos;s Engineering College</span>
           </div>
         </motion.div>
 

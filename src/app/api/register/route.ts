@@ -79,7 +79,7 @@ export async function POST(req: Request) {
             <div style="background: #f8fafc; padding: 15px; border-radius: 5px; margin: 20px 0;">
               <p><strong>Registration ID:</strong> ${registrationId}</p>
               <p><strong>Date:</strong> 21 September 2026 | <strong>Time:</strong> 10:00 AM</p>
-              <p><strong>Venue:</strong> St. Peter's Engineering College, Maisammaguda</p>
+              <p><strong>Venue:</strong> St. Peter's Engineering College</p>
             </div>
 
             <h3>TEAM DETAILS</h3>

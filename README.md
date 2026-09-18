@@ -3,7 +3,7 @@
 ![TechTactix Banner](https://img.shields.io/badge/Event-TECHTACTIX%202026-06b6d4?style=for-the-badge&logo=next.js&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Live-success?style=for-the-badge)
 
-A premium, modern, and highly interactive event registration platform built for **TechTactix 2026** — the ultimate technical competition organized by the CSI Student Chapter at St. Peter's Engineering College, Maisammaguda.
+A premium, modern, and highly interactive event registration platform built for **TechTactix 2026** — the ultimate technical competition organized by the CSI Student Chapter at St. Peter's Engineering College.
 
 *"Think Smart. Pitch Strong. Defend Better."*
 
