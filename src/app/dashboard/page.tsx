@@ -15,7 +15,7 @@ export default async function Dashboard() {
   const csiMembers = registrations.reduce((acc: number, curr: any) => {
     let count = 0;
     if (curr.participant1Membership === 'CSI Member') count++;
-    if (curr.participant2Membership === 'CSI Member') count++;
+    if (curr.participant2Name && curr.participant2Membership === 'CSI Member') count++;
     return acc + count;
   }, 0);
 
@@ -88,15 +88,27 @@ export default async function Dashboard() {
 
                       {/* Participant 2 */}
                       <td className="px-6 py-4 border-l border-white/5">
-                        <div className="font-bold text-white">{reg.participant2Name}</div>
-                        <div className="text-xs text-slate-400">{reg.participant2RollNumber}</div>
-                        <div className={`text-xs mt-1 ${reg.participant2Membership === 'CSI Member' ? 'text-green-400' : 'text-yellow-400'}`}>
-                          {reg.participant2Membership}
-                        </div>
+                        {reg.participant2Name ? (
+                          <>
+                            <div className="font-bold text-white">{reg.participant2Name}</div>
+                            <div className="text-xs text-slate-400">{reg.participant2RollNumber}</div>
+                            <div className={`text-xs mt-1 ${reg.participant2Membership === 'CSI Member' ? 'text-green-400' : 'text-yellow-400'}`}>
+                              {reg.participant2Membership}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-slate-500 italic">Solo Participant</div>
+                        )}
                       </td>
                       <td className="px-6 py-4 text-slate-300">
-                        {reg.participant2Branch}<br/>
-                        <span className="text-xs text-slate-500">{reg.participant2Year}</span>
+                        {reg.participant2Name ? (
+                          <>
+                            {reg.participant2Branch}<br/>
+                            <span className="text-xs text-slate-500">{reg.participant2Year}</span>
+                          </>
+                        ) : (
+                          <span className="text-slate-500">-</span>
+                        )}
                       </td>
 
                       {/* Fee */}

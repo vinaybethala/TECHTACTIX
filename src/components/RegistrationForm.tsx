@@ -24,7 +24,7 @@ const participantSchema = z.object({
 
 const formSchema = z.object({
   participant1: participantSchema,
-  participant2: participantSchema,
+  participant2: participantSchema.optional().nullable(),
 });
 
 const customZodResolver = (schema: any) => async (data: any) => {
@@ -49,6 +49,7 @@ type FormValues = z.infer<typeof formSchema>;
 export function RegistrationForm() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSolo, setIsSolo] = useState(false);
   const [successData, setSuccessData] = useState<{ id: string } | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [isClosed, setIsClosed] = useState(false);
@@ -73,14 +74,19 @@ export function RegistrationForm() {
   const calculateFee = () => {
     let fee = 0;
     if (p1Membership === "Non-CSI Member") fee += 30;
-    if (p2Membership === "Non-CSI Member") fee += 30;
+    if (!isSolo && p2Membership === "Non-CSI Member") fee += 30;
     return fee;
   };
 
-  const nextStep = async () => {
+  const nextStep = async (solo = false) => {
     let valid = false;
     if (step === 1) {
       valid = await trigger("participant1");
+      if (valid) {
+        setIsSolo(solo);
+        setStep(solo ? 3 : 2);
+        return;
+      }
     } else if (step === 2) {
       valid = await trigger("participant2");
     }
@@ -88,13 +94,19 @@ export function RegistrationForm() {
     if (valid) setStep(step + 1);
   };
 
-  const prevStep = () => setStep(step - 1);
+  const prevStep = () => {
+    if (step === 3 && isSolo) {
+      setStep(1);
+    } else {
+      setStep(step - 1);
+    }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       if (step < 3) {
-        nextStep();
+        nextStep(false);
       } else if (isAccepted && !isSubmitting) {
         handleSubmit(onSubmit)();
       }
@@ -105,11 +117,16 @@ export function RegistrationForm() {
     setIsSubmitting(true);
     setErrorMsg("");
     
+    const payload = {
+      participant1: data.participant1,
+      participant2: isSolo ? undefined : data.participant2
+    };
+
     try {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
       
       const result = await res.json();
@@ -202,7 +219,7 @@ export function RegistrationForm() {
       
       <div className="mb-8 text-center">
         <h2 className="text-3xl font-heading font-bold text-white mb-2">BUILD YOUR TEAM</h2>
-        <p className="text-slate-400 text-sm md:text-base italic">&quot;Two minds. One team. One chance to dominate.&quot;</p>
+        <p className="text-slate-400 text-sm md:text-base italic">&quot;Two minds. One team. Or go solo and dominate.&quot;</p>
       </div>
 
       {/* Progress */}
@@ -260,7 +277,7 @@ export function RegistrationForm() {
               <h3 className="text-2xl font-heading font-bold text-white mb-6 text-center">READY TO ENTER THE ARENA?</h3>
               
               <div className="bg-navy-950/80 rounded-xl border border-white/5 p-6 mb-6">
-                <div className="grid md:grid-cols-2 gap-8">
+                <div className={`grid ${isSolo ? 'md:grid-cols-1' : 'md:grid-cols-2'} gap-8`}>
                   <div>
                     <h4 className="text-cyan-400 font-bold mb-4 border-b border-white/10 pb-2">Participant 01</h4>
                     <SummaryData label="Name" value={getValues("participant1.name")} />
@@ -269,14 +286,16 @@ export function RegistrationForm() {
                     <SummaryData label="Year" value={getValues("participant1.year")} />
                     <SummaryData label="Status" value={p1Membership} highlight />
                   </div>
-                  <div>
-                    <h4 className="text-cyan-400 font-bold mb-4 border-b border-white/10 pb-2">Participant 02</h4>
-                    <SummaryData label="Name" value={getValues("participant2.name")} />
-                    <SummaryData label="Roll No" value={getValues("participant2.rollNumber")} />
-                    <SummaryData label="Branch" value={getValues("participant2.branch")} />
-                    <SummaryData label="Year" value={getValues("participant2.year")} />
-                    <SummaryData label="Status" value={p2Membership} highlight />
-                  </div>
+                  {!isSolo && (
+                    <div>
+                      <h4 className="text-cyan-400 font-bold mb-4 border-b border-white/10 pb-2">Participant 02</h4>
+                      <SummaryData label="Name" value={getValues("participant2.name")} />
+                      <SummaryData label="Roll No" value={getValues("participant2.rollNumber")} />
+                      <SummaryData label="Branch" value={getValues("participant2.branch")} />
+                      <SummaryData label="Year" value={getValues("participant2.year")} />
+                      <SummaryData label="Status" value={p2Membership} highlight />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -284,7 +303,7 @@ export function RegistrationForm() {
                 <div>
                   <h4 className="font-bold text-white mb-1">PAYMENT SUMMARY</h4>
                   <p className="text-sm text-slate-400">Payment method: <strong className="text-white">Pay at Venue</strong></p>
-                  {calculateFee() === 0 && <p className="text-sm text-cyan-400 mt-1">Both participants are CSI members. Registration is FREE.</p>}
+                  {calculateFee() === 0 && <p className="text-sm text-cyan-400 mt-1">{isSolo ? "You are a CSI member. Registration is FREE." : "Both participants are CSI members. Registration is FREE."}</p>}
                 </div>
                 <div className="text-right">
                   <div className="text-sm text-slate-400">TOTAL PAYABLE</div>
@@ -321,8 +340,17 @@ export function RegistrationForm() {
             </button>
           ) : <div></div>}
 
-          {step < 3 ? (
-            <button type="button" onClick={nextStep} className="px-8 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-colors glow-border flex items-center gap-2">
+          {step === 1 ? (
+            <div className="flex gap-4">
+              <button type="button" onClick={() => nextStep(true)} className="px-4 md:px-6 py-2 bg-white/5 hover:bg-white/10 text-slate-300 font-bold rounded-lg transition-colors border border-white/10 text-sm md:text-base">
+                GO SOLO
+              </button>
+              <button type="button" onClick={() => nextStep(false)} className="px-4 md:px-8 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-colors glow-border flex items-center gap-2 text-sm md:text-base">
+                ADD TEAMMATE
+              </button>
+            </div>
+          ) : step === 2 ? (
+            <button type="button" onClick={() => nextStep(false)} className="px-8 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-colors glow-border flex items-center gap-2">
               NEXT STEP
             </button>
           ) : (
@@ -330,7 +358,7 @@ export function RegistrationForm() {
               {isSubmitting ? (
                 <><Loader2 className="w-5 h-5 animate-spin" /> CONFIRMING...</>
               ) : (
-                "REGISTER TEAM"
+                "REGISTER"
               )}
             </button>
           )}
@@ -425,7 +453,7 @@ function ParticipantFields({ prefix, register, errors }: any) {
   );
 }
 
-function SummaryData({ label, value, highlight = false }: { label: string, value: string, highlight?: boolean }) {
+function SummaryData({ label, value, highlight = false }: { label: string, value: string | undefined, highlight?: boolean }) {
   return (
     <div className="flex justify-between py-1 border-b border-white/5 last:border-0">
       <span className="text-slate-500 text-sm">{label}</span>

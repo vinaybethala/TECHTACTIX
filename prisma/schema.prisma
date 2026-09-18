@@ -19,12 +19,12 @@ model Registration {
   participant1Email         String
   participant1Membership    String
   
-  participant2Name          String
-  participant2RollNumber    String   @unique
-  participant2Year          String
-  participant2Branch        String
-  participant2Email         String
-  participant2Membership    String
+  participant2Name          String?
+  participant2RollNumber    String?  @unique
+  participant2Year          String?
+  participant2Branch        String?
+  participant2Email         String?
+  participant2Membership    String?
   
   totalFee                  Int
   paymentStatus             String   @default("Pending at Venue")

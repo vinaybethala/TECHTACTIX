@@ -9,12 +9,12 @@ export async function POST(req: Request) {
 
     let totalFee = 0;
     if (participant1.membership === "Non-CSI Member") totalFee += 30;
-    if (participant2.membership === "Non-CSI Member") totalFee += 30;
+    if (participant2?.membership === "Non-CSI Member") totalFee += 30;
 
     const registrationId = `TTX-2026-${Math.floor(10000 + Math.random() * 90000)}`;
 
     // Check duplicates
-    if (participant1.rollNumber === participant2.rollNumber) {
+    if (participant2 && participant1.rollNumber === participant2.rollNumber) {
       return NextResponse.json({ error: "Participants cannot have the same roll number." }, { status: 400 });
     }
 
@@ -23,8 +23,10 @@ export async function POST(req: Request) {
         OR: [
           { participant1RollNumber: participant1.rollNumber },
           { participant2RollNumber: participant1.rollNumber },
-          { participant1RollNumber: participant2.rollNumber },
-          { participant2RollNumber: participant2.rollNumber }
+          ...(participant2 ? [
+            { participant1RollNumber: participant2.rollNumber },
+            { participant2RollNumber: participant2.rollNumber }
+          ] : [])
         ]
       }
     });
@@ -43,12 +45,12 @@ export async function POST(req: Request) {
         participant1Email: participant1.email,
         participant1Membership: participant1.membership,
         
-        participant2Name: participant2.name,
-        participant2RollNumber: participant2.rollNumber,
-        participant2Year: participant2.year,
-        participant2Branch: participant2.branch,
-        participant2Email: participant2.email,
-        participant2Membership: participant2.membership,
+        participant2Name: participant2?.name || null,
+        participant2RollNumber: participant2?.rollNumber || null,
+        participant2Year: participant2?.year || null,
+        participant2Branch: participant2?.branch || null,
+        participant2Email: participant2?.email || null,
+        participant2Membership: participant2?.membership || null,
         
         totalFee,
       }
@@ -66,7 +68,7 @@ export async function POST(req: Request) {
 
       const info = await transporter.sendMail({
         from: '"TechTactix 2026" <csi.spec@stpetershyd.com>',
-        to: `${participant1.email}, ${participant2.email}`,
+        to: participant2 ? `${participant1.email}, ${participant2.email}` : participant1.email,
         subject: 'TechTactix 2026 — Registration Confirmed 🎯',
         html: `
           <div style="font-family: Arial, sans-serif; color: #333; max-w: 600px; margin: 0 auto; border: 1px solid #eee; padding: 20px; border-radius: 8px;">
@@ -85,7 +87,7 @@ export async function POST(req: Request) {
             <h3>TEAM DETAILS</h3>
             
             <p><strong>Participant 1:</strong> ${participant1.name} (${participant1.rollNumber}) - ${participant1.membership}</p>
-            <p><strong>Participant 2:</strong> ${participant2.name} (${participant2.rollNumber}) - ${participant2.membership}</p>
+            ${participant2 ? `<p><strong>Participant 2:</strong> ${participant2.name} (${participant2.rollNumber}) - ${participant2.membership}</p>` : ''}
             
             <h3>REGISTRATION FEE</h3>
             <p style="font-size: 18px;"><strong>Total payable at venue: ₹${totalFee}</strong></p>
